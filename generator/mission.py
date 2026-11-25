@@ -3,7 +3,7 @@ import numpy as np, json, sys
 from asciisvg import *
 
 C, R, SS = 240, 34, 3
-NF, FPS = 64, 8
+NF, FPS = 1, 8          # 1 = still planet (light). Set e.g. 64 for a spinning planet (heavier).
 X, Y = grid(C, R, SS)
 cx, cy, RP = 52.0, R / 2 / 0.6, 21.0
 TILT = -0.14
@@ -64,7 +64,7 @@ def frame(t):
     lum, c = to_cells(rgb, R, C, SS)
     return asciify(lum, c, exposure=2.4)
 
-frames = [frame(f / NF) for f in range(NF)]
+frames = [frame(0.15 + f / NF) for f in range(NF)]
 
 # ---- terminal box drawn in the grid ----
 BX0, BX1, BY0, BY1 = 102, 236, 2, R - 3

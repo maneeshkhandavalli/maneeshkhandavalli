@@ -72,7 +72,7 @@ def draw_stars(ch, cl, t):
 
 base_ch, base_cl = bch.copy(), bcol.copy()
 draw_stars(base_ch, base_cl, None)
-NF, FPS = 24, 6
+NF, FPS = 0, 6           # 0 = still image (light). Set 24 to make the stars twinkle.
 frames = []
 for f in range(NF):
     ch = np.full((R, C), TRANSPARENT); cl = np.zeros((R, C, 3), np.uint8)
@@ -92,7 +92,7 @@ for i, d in enumerate(days):
         months.append((10 + ((i + off) // 7) * (220 / 52), dd.strftime("%b").lower()))
 mx = "".join(f'<text class="mo" x="{x * CW:.0f}" y="{(R - 1) * CH}">{m}</text>' for x, m in months if x < 228)
 hdr = f'<text class="hdr" x="{4 * CW}" y="{2 * CH + 12}">[ {S["total"]} contributions in the last year :: charted as stars ]</text>'
-svg = build_layers((base_ch, base_cl), [dict(frames=frames, fps=FPS)], extra_svg=hdr + mx,
+svg = build_layers((base_ch, base_cl), [dict(frames=frames, fps=FPS)] if NF else [], extra_svg=hdr + mx,
                    extra_css=".hdr{font:500 15px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;fill:rgb(240,179,90)}"
                              ".mo{font:13px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;fill:rgb(110,118,129)}")
 open("out/constellation.svg", "w").write(svg)

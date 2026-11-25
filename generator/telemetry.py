@@ -38,7 +38,7 @@ vert = np.clip((Y * 0.6 - ROW0) / NUMH, 0, 1)
 num_col = ramp_color(vert, [0, 0.5, 1], [[255, 236, 205], [245, 175, 85], [205, 95, 40]])
 glow = gaussian_filter(mask, 6) * 0.25
 
-NF, FPS = 40, 10
+NF, FPS = 1, 10          # 1 = still image (light). Set 40 for the scan sweep.
 def frame(t):
     sweep_x = -20 + (C + 40) * t
     sw = np.exp(-((X - sweep_x - (Y * 0.6) * 0.6) / 5.0) ** 2)
