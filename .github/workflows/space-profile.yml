@@ -1,0 +1,42 @@
+name: space-profile
+
+on:
+  schedule:
+    - cron: "17 19 * * *"        # every day, 00:47 IST
+  workflow_dispatch:
+  push:
+    paths:
+      - "generator/**"
+      - ".github/workflows/space-profile.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install
+        run: pip install numpy scipy pillow
+      - name: Render sections
+        working-directory: generator
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python fetch_stats.py
+          python contrib.py
+          python telemetry.py
+          python mission.py profile.json
+          python orbit.py profile.json
+          cp out/*.svg ../assets/
+      - name: Commit
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add assets
+          git diff --cached --quiet || git commit -m "refresh space telemetry"
+          git push
