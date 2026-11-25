@@ -33,7 +33,7 @@ mask = np.asarray(img, float) / 255
 from scipy.ndimage import gaussian_filter
 bev = gaussian_filter(mask, 2.0)
 gy, gx = np.gradient(bev)
-shade = np.clip(0.75 - 3.0 * (gx * 0.6 + gy * 0.8), 0.25, 1.3)
+shade = np.clip(1.0 - 1.5 * (gx * 0.6 + gy * 0.8), 0.7, 1.25)
 vert = np.clip((Y * 0.6 - ROW0) / NUMH, 0, 1)
 num_col = ramp_color(vert, [0, 0.5, 1], [[255, 236, 205], [245, 175, 85], [205, 95, 40]])
 glow = gaussian_filter(mask, 6) * 0.25
@@ -46,7 +46,7 @@ def frame(t):
     num += np.array([1.0, 0.6, 0.25]) * glow[..., None]
     st = starfield(X, Y, 44, density=0.0011, t=t)[..., None] * np.array([0.8, 0.85, 1.0]) * (mask < 0.05)[..., None]
     lum, c = to_cells(num + st, R, C, SS)
-    return asciify(lum, c, exposure=2.4, floor=0.05)
+    return asciify(lum, c, exposure=4.0, floor=0.05, gamma=0.6, min_bright=0.6, ramp=" .:-=+*#%@")
 
 frames = [frame(f / NF) for f in range(NF)]
 dim = np.array([95, 85, 70], np.uint8)

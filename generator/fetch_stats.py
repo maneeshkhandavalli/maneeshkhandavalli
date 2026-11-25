@@ -34,14 +34,14 @@ else:
     som = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
     q = """query($login:String!,$from:DateTime!,$to:DateTime!){user(login:$login){
       repositories(ownerAffiliations:OWNER,privacy:PUBLIC,first:100){totalCount nodes{stargazerCount}}
-      contributionsCollection{contributionCalendar{totalContributions weeks{contributionDays{date contributionCount}}}}
+      contributionsCollection{restrictedContributionsCount contributionCalendar{totalContributions weeks{contributionDays{date contributionCount}}}}
       month:contributionsCollection(from:$from,to:$to){totalCommitContributions}}}"""
     body = json.dumps({"query": q, "variables": {"login": LOGIN, "from": som.isoformat(), "to": now.isoformat()}}).encode()
     req = urllib.request.Request("https://api.github.com/graphql", body, {"Authorization": f"bearer {token}"})
     u = json.load(urllib.request.urlopen(req))["data"]["user"]
     cal = u["contributionsCollection"]["contributionCalendar"]
     days = [{"date": d["date"], "count": d["contributionCount"]} for w in cal["weeks"] for d in w["contributionDays"]]
-    stats = dict(total=cal["totalContributions"], repos=u["repositories"]["totalCount"],
+    stats = dict(total=cal["totalContributions"] + u["contributionsCollection"]["restrictedContributionsCount"], repos=u["repositories"]["totalCount"],
                  month_commits=u["month"]["totalCommitContributions"],
                  stars=sum(n["stargazerCount"] for n in u["repositories"]["nodes"]))
 cur, best = streaks(days)
